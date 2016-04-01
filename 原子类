@@ -1,0 +1,13 @@
+java在对变量进行操作时，除了可以使用synchronized关键字实现同步外，还可以使用Atomic类进行实现。
+原子操作是不能分割的整体，没其他线程能够中断或检查正在原子操作的变量。
+一个Atomic类型就是一个原子操作可用的类型，它可以在没有锁的的情况下做到线程安全。
+但是，原子类在具有有逻辑性情况下的输出也会具有随机性。
+
+查看AutomicXXX类的源码，发现都需要native方法的支持，native方法采用CAS算法。CAS是一种无锁（乐观锁？）算法，CAS是CPU支持的指令：
+1、获取当前值currentVal和修改后值updateVal
+2、强currentVal和updteVal同时发送给CPU
+3、CPU将currentVal和CPU中的actualVal进行对比：
+      如果相等，就说明这个过程中值没有被修改过，属于安全操作，CPU将值改为updateVal
+      如果不相等，返回失败操作
+4、在失败操作的情况下，会继续第一步的操作，直到修改成功为止
+CAS：Compare And Set的简写, 即比较再设值，不会锁住当前线程，却在并发度越高的情况下，失败的次数会越多，消耗CPU的资源也就越多。
